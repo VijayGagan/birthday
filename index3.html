@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Journey</title>
+    <style>
+        /* --- GENERAL SETUP --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            user-select: none;
+        }
+
+        .stage {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .active { display: flex; }
+
+        /* --- STAGE 1: SLIDESHOW --- */
+        #stage1 { background-color: #1a1a1a; }
+        .slide-container {
+            position: relative; width: 80%; height: 60vh;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 30px;
+        }
+        .slide-img {
+            max-width: 100%; max-height: 100%;
+            border-radius: 10px; position: absolute;
+            opacity: 0; transition: opacity 1s ease-in-out;
+        }
+        .slide-img.show { opacity: 1; }
+        
+        #nextBtn {
+            display: none; padding: 12px 25px; font-size: 18px;
+            cursor: pointer; background: #ff3366; color: white;
+            border: none; border-radius: 30px; animation: fadeIn 1s;
+        }
+
+        /* --- STAGE 2 & 5: VIDEO PLAYERS --- */
+        video {
+            max-width: 90%; max-height: 80vh;
+            border: 2px solid white; border-radius: 10px;
+        }
+
+        /* --- STAGE 3: THE CATCH GAME --- */
+        #stage3 { background-color: #ffe6e9; position: relative; cursor: crosshair; }
+        
+        #game-instruction {
+            position: absolute; top: 10%;
+            color: #ff3366; font-size: 24px; font-weight: bold;
+        }
+
+        #flying-envelope {
+            position: absolute;
+            font-size: 80px; /* Made the icon bigger so it is easier to click */
+            cursor: pointer;
+            transition: all 0.8s ease; /* Slower movement animation */
+        }
+
+        /* --- STAGE 4: MAIN ENVELOPE --- */
+        #stage4 { background-color: #ffe6e9; color: #333; }
+        .envelope-wrapper {
+            position: relative; cursor: pointer;
+            transition: transform 0.5s;
+        }
+        .envelope-wrapper:hover { transform: scale(1.05); }
+        .envelope {
+            position: relative; width: 300px; height: 200px;
+            background-color: #ff3366; border-radius: 5px; z-index: 2;
+        }
+        .envelope::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ff6688;
+            transform-origin: top; transition: transform 0.8s ease-in-out; z-index: 4;
+        }
+        .heart {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -60%); font-size: 40px; z-index: 5;
+            transition: opacity 0.5s;
+        }
+        .letter {
+            position: absolute; top: 10px; left: 15px;
+            width: 270px; height: 180px; background-color: white;
+            padding: 20px; box-sizing: border-box;
+            transition: all 1s ease-in-out; z-index: 1; opacity: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .envelope-wrapper.open .envelope::before { transform: rotateX(180deg); z-index: 0; }
+        .envelope-wrapper.open .heart { opacity: 0; }
+        .envelope-wrapper.open .letter {
+            transform: translateY(-220px); opacity: 1; z-index: 6; height: 300px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="stage1" class="stage active">
+        <h2>Our Memories</h2>
+        <div class="slide-container">
+            <img src="img/img3.jpg.jpeg" class="slide-img show">
+            <img src="img/img17.jpeg" class="slide-img">
+            <img src="img/img18.jpeg" class="slide-img">
+            <img src="img/img27.jpeg" class="slide-img">
+            <img src="img/img12.jpeg" class="slide-img">
+            <img src="img/img31.jpeg" class="slide-img">
+            <img src="img/img11.jpeg" class="slide-img">
+            <img src="img/img24.jpeg" class="slide-img">
+            <img src="img/img28.jpeg" class="slide-img">
+            <img src="img/img30.jpeg" class="slide-img">
+            <img src="img/img22.jpeg" class="slide-img">
+            <img src="img/img21.jpeg" class="slide-img">
+            <img src="img/img14.jpeg" class="slide-img">
+            <img src="img/img29.jpeg" class="slide-img">
+        </div>
+        <button id="nextBtn" onclick="finishSlideshow()">Continue ➜</button>
+    </div>
+
+    <div id="stage2" class="stage">
+        <h2>Watch this...</h2>
+        <video id="video1" controls>
+            <source src="videos/vid2.mp4" type="video/mp4">
+        </video>
+        <br><br>
+        <button onclick="finishVideo1()" style="padding: 10px; background: #333; color: white;">Next Step ➜</button>
+    </div>
+
+    <div id="stage3" class="stage">
+        <div id="game-instruction">Catch the letter! Click it 3 times! <br> Score: <span id="score">0</span>/3</div>
+        <div id="flying-envelope" onclick="catchEnvelope()">💌</div>
+    </div>
+
+    <div id="stage4" class="stage">
+        <div class="envelope-wrapper" onclick="openEnvelope()">
+            <div class="envelope">
+                <div class="heart">Open Me</div>
+            </div>
+            <div class="letter">
+                <p><strong>You caught it!</strong><br><br>
+                You are fast!<br>
+                I have one last surprise video for you.</p>
+                <button onclick="goToVideo2(event)" style="background: #ff3366; color: white; padding: 10px; border:none; border-radius:5px; cursor:pointer;">Watch Final Video ➜</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="stage5" class="stage">
+        <video id="video2" controls>
+            <source src="videos/vid3.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        // --- STAGE 1: SLIDESHOW ---
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.slide-img');
+        let slideInterval;
+
+        function showNextSlide() {
+            if (slideIndex >= slides.length - 1) {
+                clearInterval(slideInterval);
+                document.getElementById('nextBtn').style.display = 'block';
+                return;
+            }
+            slides[slideIndex].classList.remove('show');
+            slideIndex++;
+            slides[slideIndex].classList.add('show');
+        }
+        slideInterval = setInterval(showNextSlide, 3000);
+
+        function finishSlideshow() {
+            document.getElementById('stage1').classList.remove('active');
+            document.getElementById('stage2').classList.add('active');
+            document.getElementById('video1').play().catch(() => {});
+        }
+
+        // --- STAGE 2: VIDEO 1 ---
+        document.getElementById('video1').addEventListener('ended', finishVideo1);
+        function finishVideo1() {
+            document.getElementById('video1').pause();
+            document.getElementById('stage2').classList.remove('active');
+            document.getElementById('stage3').classList.add('active');
+            startGame(); 
+        }
+
+        // --- STAGE 3: GAME LOGIC (UPDATED SLOW SPEED) ---
+        let score = 0;
+        const target = document.getElementById('flying-envelope');
+        const scoreDisplay = document.getElementById('score');
+        let gameTimer;
+
+        function startGame() {
+            moveTarget(); 
+            // 1200ms = 1.2 seconds (Slow speed)
+            gameTimer = setInterval(moveTarget, 1200);
+        }
+
+        function moveTarget() {
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 150);
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+        }
+
+        function catchEnvelope() {
+            score++;
+            scoreDisplay.innerText = score;
+            
+            clearInterval(gameTimer);
+            
+            // It gets slightly faster, but still starts slow (1.2s -> 1.0s -> 0.8s)
+            gameTimer = setInterval(moveTarget, 1200 - (score * 200));
+
+            if (score >= 3) {
+                clearInterval(gameTimer);
+                document.getElementById('game-instruction').innerText = "Gotcha!";
+                setTimeout(() => {
+                    document.getElementById('stage3').classList.remove('active');
+                    document.getElementById('stage4').classList.add('active');
+                }, 500);
+            } else {
+                moveTarget();
+            }
+        }
+
+        // --- STAGE 4: ENVELOPE ---
+        function openEnvelope() {
+            document.querySelector('.envelope-wrapper').classList.add('open');
+        }
+
+        function goToVideo2(event) {
+            event.stopPropagation();
+            document.getElementById('stage4').classList.remove('active');
+            document.getElementById('stage5').classList.add('active');
+            document.getElementById('video2').play();
+        }
+    </script>
+</body>
+</html>
